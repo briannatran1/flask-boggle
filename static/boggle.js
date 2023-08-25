@@ -30,12 +30,13 @@ async function start() {
 function displayBoard(board) {
   // $table.remove(); #this messed things up...
   $table.empty();
-  let $tbody = $('<tbody></tbody>');
+  // jQuery can make a new element without the closing tag.
+  let $tbody = $('<tbody>');
   console.log(board);
 
   // loop over board and create the DOM tr/td structure
   for (let row of board){
-    let $row = $("<tr></tr>");
+    let $row = $("<tr>");
     for (let cell of row){
       let $cell = $(`<td>${cell}</td>`)
       $row.append($cell);
@@ -56,19 +57,8 @@ function handleSubmit(evt){
   evt.preventDefault();
   let $input = $('#wordInput');
   let word = $input.val();
-  //console.log('current value is', $input.val());
 
-  // next step: send word to backend!
-  // send to: '/api/score-word'
-  // should receive: JSON of word
-  // gameId is a JS variable of the same name:
-  // test_not_on_board = {"gameId": game_id, "word": "DINNERS"}
-
-  let request = {
-    'gameId' : gameId,
-    'word' : word
-  };
-  requestScore(request);
+  requestScore(word);
 }
 
 /**
@@ -79,22 +69,30 @@ function handleSubmit(evt){
  * error message.
  * @param {*} request
  */
-async function requestScore(request){
+async function requestScore(word){
+
   const response = await fetch(`/api/score-word`, {
     method: "POST",
-    body: JSON.stringify(request),
+    body: JSON.stringify({
+      'gameId' : gameId,
+      'word' : word
+    }),
     headers: {"Content-type" : "application/json" }
   });
 
+  //const {result } = ...
   const scoreData = await response.json();
   const resultMsg = scoreData["result"];
 
+  //fancier: addWord function could take care of append/animation
   if (resultMsg === "ok"){ //If a legal word, add to list
-    let $wordBullet = $(`<li>${request['word']}</li>`);
+    let $wordBullet = $(`<li>${word}</li>`);
     $playedWords.append($wordBullet);
     $message.text("");
-  } else { //if not a legal play, add to message
-    $message.text(resultMsg);
+  } else if (resultMsg === "not-word") { //if not a legal play, add to message
+    $message.text("Sorry that's not a real word");
+  } else if (resultMsg === "not-on-board"){
+    $message.text("That word isn't on the board")
   }
 }
 
