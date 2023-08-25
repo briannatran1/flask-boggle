@@ -1,6 +1,7 @@
 from unittest import TestCase
 
 from app import app, games
+from boggle import BoggleGame
 
 # Make Flask errors be real errors, not HTML pages with error info
 app.config['TESTING'] = True
@@ -23,6 +24,13 @@ class BoggleAppTestCase(TestCase):
 
         with self.client as client:
             response = client.get('/')
+            html = response.get_data(as_text=True)
+
+
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('<!--Home page comment for testing', html)
+
+
             ...
             # test that you're getting a template
 
@@ -30,8 +38,18 @@ class BoggleAppTestCase(TestCase):
         """Test starting a new game."""
 
         with self.client as client:
-            ...
-            # make a post request to /api/new-game
+
+
+            response = client.post('/api/new-game')
+            data = response.get_json()
+            #TODO: remove this.
+            #print(f"\n\n data from POST is: {data} \n\n")
+            #print(f"\n\n games object is: {games}")
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(type(data["gameId"]), str)
+            self.assertEqual(type(data["board"]), list)
+            self.assertIn(data["gameId"], games)
+            # DONE: make a post request to /api/new-game
             # get the response body as json using .get_json()
             # test that the game_id is a string
             # test that the board is a list
