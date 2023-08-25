@@ -56,7 +56,7 @@ class BoggleAppTestCase(TestCase):
 
     def test_score_word(self):
         """Test if word:
-            is a valid
+            is a valid word
             is on board
             """
 
@@ -71,7 +71,6 @@ class BoggleAppTestCase(TestCase):
 
             #now that we have JSON, we need to send a POST request to /api/score-word
 
-            print(f"\n\n newgame data: {new_game_data} \n\n")
             # find that game in the dictionary of games (imported from app.py above)
             game_id = new_game_data["gameId"]
             game = games[game_id]
@@ -84,9 +83,6 @@ class BoggleAppTestCase(TestCase):
             response = client.post('/api/score-word', json=test_success)
             data = response.get_json()
 
-            # print(f"\n\n data is: {data} \n\n")
-            # print(f"\n\n response is : {response} ")
-
             self.assertEqual(response.status_code, 200)
             self.assertEqual(data["result"], "ok")
 
@@ -97,6 +93,7 @@ class BoggleAppTestCase(TestCase):
 
             response = client.post('/api/score-word', json=test_not_on_board)
             data = response.get_json()
+            #better pattern: data, {"result", "not-on-board"}
             self.assertEqual(data["result"], "not-on-board")
 
             # test to see that an invalid word returns {'result': 'not-word'}
