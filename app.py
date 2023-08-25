@@ -40,13 +40,29 @@ def score_word():
 
     game_id = data["gameId"]
 
-    #TODO: refactor: no nested statements.
 
-    if games[game_id].is_word_in_word_list(word):
-        if games[game_id].check_word_on_board(word):
-            return jsonify({"result": "ok"})
-
-        elif not games[game_id].check_word_on_board(word):
-            return jsonify({"result": "not-on-board"})
-    else:
+    if not games[game_id].is_word_in_word_list(word):
         return jsonify({"result": "not-word"})
+    elif not games[game_id].check_word_on_board(word):
+        return jsonify({"result": "not-on-board"})
+    elif not games[game_id].is_word_not_a_dup(word):
+        #Handle a duplicate word. Not working currently.
+        return jsonify({"result" : "duplicate word"})
+    else:
+        return jsonify({"result": "ok"})
+
+
+
+    # if not games[game_id].is_word_in_word_list(word):
+    #     return jsonify({"result": "not-word"})
+    # elif not games[game_id].check_word_on_board(word):
+    #     return jsonify({"result": "not-on-board"})
+    # elif not games[game_id].is_word_not_a_dup(word):
+    #     #Handle a duplicate word.
+    #     return jsonify({"result" : "duplicate word"})
+    # else:
+    #     #return jsonify({"result": "ok"})
+    #     #may need to modify return:
+    #     #below method returns a score (int), and updates games[game_id] object.
+    #     score = games[game_id].play_and_score_word(word)
+    #     return jsonify({"result" : score})
