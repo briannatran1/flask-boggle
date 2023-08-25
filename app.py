@@ -32,9 +32,10 @@ def new_game():
 @app.post('/api/score-word')
 def score_word():
     """Checks if word is in word list and can be found on game board"""
-
-    word = request.form['word']
-    game_id = list(games.keys())[0]
+    #api/score-word should receive JSON data containing the word.
+    data = request.json #word
+    word = data.get("word") #key needed
+    game_id = data.get("gameId")
 
     if games[game_id].is_word_in_word_list(word):
         if games[game_id].check_word_on_board(word):
